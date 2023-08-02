@@ -107,11 +107,14 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
             json_file['__metadata__'] = {
                 "Model_A" : safetensor1.filename,
                 "Model_B" : safetensor2.filename,
-                "ratio" : str(base_ratio),
-                "text" : metadata,
+                "Ratio" : str(base_ratio),
+                "Text" : metadata,
                 "Model_A metadata" : json.dumps(safetensor1.metadata),
                 "Model_B metadata" : json.dumps(safetensor2.metadata),
             }
+            if len(weights) != 0:
+                json_file['__metadata__']['Block Weights'] = [w for k, w in weights]
+                print( json_file['__metadata__']['Block Weights'])
 
         json_binary =bytes(json.dumps(json_file).replace(' ', ''), "utf-8")
         json_size = len(json_binary)
