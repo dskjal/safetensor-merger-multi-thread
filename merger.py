@@ -114,7 +114,6 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
             }
             if len(weights) != 0:
                 json_file['__metadata__']['Block Weights'] = [w for k, w in weights]
-                print( json_file['__metadata__']['Block Weights'])
 
         json_binary =bytes(json.dumps(json_file).replace(' ', ''), "utf-8")
         json_size = len(json_binary)
