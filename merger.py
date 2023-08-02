@@ -113,7 +113,7 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
                 "Model_B metadata" : json.dumps(safetensor2.metadata),
             }
             if len(weights) != 0:
-                json_file['__metadata__']['Block Weights'] = [w for k, w in weights]
+                json_file['__metadata__']['Block Weights'] = str([w for k, w in weights])
 
         json_binary =bytes(json.dumps(json_file).replace(' ', ''), "utf-8")
         json_size = len(json_binary)
@@ -121,13 +121,14 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
         if write_metadata:
             del json_file['__metadata__']
         
-        total_size = HEADER_SIZE
+        # calc file size
+        total_size = HEADER_SIZE + json_size
+        for k, v in json_file.items():
+            begin, end = v['data_offsets']
+            total_size += end - begin
         wmm.resize(total_size)
-        wmm.write((json_size).to_bytes(8, byteorder))
 
-        # write json
-        total_size += json_size
-        wmm.resize(total_size)
+        wmm.write((json_size).to_bytes(8, byteorder))
         wmm.write(json_binary)
 
         # fix position_id https://note.com/bbcmc/n/n12c05bf109cc
@@ -137,8 +138,6 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
         if num_thread == 1:
             np_type = to_np_type[sttype]
             for k, v in json_file.items():
-                begin, end = v['data_offsets']
-                total_size += end - begin
                 ratio = get_ratio(weights, k, base_ratio)
 
                 try:
@@ -152,7 +151,6 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
                     # fix position_id https://note.com/bbcmc/n/n12c05bf109cc
                     weighted.round()
 
-                wmm.resize(total_size)
                 wmm.write(weighted.tobytes())
         else:
             # merge on memory
@@ -177,9 +175,6 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
 
             # write
             for k, v in json_file.items():
-                begin, end = v['data_offsets']
-                total_size += end - begin
-                wmm.resize(total_size)
                 wmm.write(v['weights'])
 
 def get_ratio(weights, k, base_ratio):
