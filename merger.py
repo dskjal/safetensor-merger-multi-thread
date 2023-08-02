@@ -51,6 +51,8 @@ class safetensor_loader:
 
         self.header_size = int.from_bytes(self.mm[0:HEADER_SIZE], byteorder=byteorder)
         self.json_dict = json.loads(self.mm[HEADER_SIZE: HEADER_SIZE + self.header_size].decode('utf-8'))
+
+        self.metadata = {}
         if '__metadata__' in self.json_dict:
             self.metadata = self.json_dict['__metadata__']
             del self.json_dict['__metadata__']
@@ -82,7 +84,7 @@ class safetensor_loader:
 
         val = self.json_dict[key]
         begin, end = val['data_offsets']
-        buffer = np.frombuffer(self.mm[self.data_offset + begin : self.data_offset + end], dtype=sttype_to_nptype[ val['dtype'] ] )
+        buffer = np.frombuffer(buffer=self.mm, dtype=sttype_to_nptype[ val['dtype'] ], offset=self.data_offset+begin, count=int(np.prod(val["shape"])) )
         if nptype != to_np_type[val['dtype']]:
             buffer = buffer.astype(nptype)
         return buffer
