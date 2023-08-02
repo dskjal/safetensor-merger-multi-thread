@@ -113,7 +113,7 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
                 "Model_B metadata" : json.dumps(safetensor2.metadata),
             }
             if len(weights) != 0:
-                json_file['__metadata__']['Block Weights'] = str([w for k, w in weights])
+                json_file['__metadata__']['Block Weights'] = str([w for k, w in weights])[1:-1]
 
         json_binary =bytes(json.dumps(json_file).replace(' ', ''), "utf-8")
         json_size = len(json_binary)
@@ -145,8 +145,8 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
                 weighted.round()
             return weighted.tobytes()
         
-        # merge
         if num_thread == 1:
+            # merge and write
             for k in json_file.keys():
                 wmm.write(get_merged_weights_bytes(safetensor1, safetensor2, k, to_np_type[sttype], weights, base_ratio))
         else:
@@ -218,4 +218,7 @@ if args.weight_file_path:
         print(f"Weight file {args.weight_file_path} is not found.")
         exit(1)
 
-write_multi_thread(args.out, st, st2, args.ratio, sttype=args.dtype, num_thread=args.num_thread, metadata=args.meta_data, write_metadata=not args.discard_metadata, weights=weights)
+with open('stat_xl.csv', 'w') as f:
+    for k, v in st.get_json().items():
+        f.write(f'{int(np.prod(v["shape"]))},{k}\n')
+#write_multi_thread(args.out, st, st2, args.ratio, sttype=args.dtype, num_thread=args.num_thread, metadata=args.meta_data, write_metadata=not args.discard_metadata, weights=weights)
