@@ -5,7 +5,7 @@
 
 # How to use
 ### command example
-python .\merger.py Model_A_path Model_B_path Output_model_path Merge_ratio Memory_type --num_thread 12 --weight_file_path weights.txt
+python .\merger.py Model_A_path Model_B_path Output_model_path Merge_ratio Weight_type --num_thread 12 --weight_file_path weights.txt
 
 ### Command Arguments
 |Command|Description|
@@ -42,7 +42,7 @@ python .\merger.py Model_A_path Model_B_path Output_model_path Merge_ratio Memor
 
 # 使い方
 ### コマンド例
-python .\merger.py Model_A_path Model_B_path Output_model_path Merge_ratio Memory_type --num_thread 12 --weight_file_path weights.txt
+python .\merger.py Model_A_path Model_B_path Output_model_path Merge_ratio Weight_type --num_thread 12 --weight_file_path weights.txt
 
 ### 引数リスト
 |Command|Description|
