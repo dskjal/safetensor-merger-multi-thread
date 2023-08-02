@@ -123,7 +123,7 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
         
         # calc file size
         total_size = HEADER_SIZE + json_size
-        for k, v in json_file.items():
+        for v in json_file.values():
             begin, end = v['data_offsets']
             total_size += end - begin
         wmm.resize(total_size)
@@ -140,14 +140,14 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
             except:
                 weighted = w1
 
-            if k in [ k for k, v in json_file.items() if k.endswith('position_ids')]:
+            if k in [ k for k in json_file.keys() if k.endswith('position_ids')]:
                 # fix position_id https://note.com/bbcmc/n/n12c05bf109cc
                 weighted.round()
             return weighted.tobytes()
         
         # merge
         if num_thread == 1:
-            for k, v in json_file.items():
+            for k in json_file.keys():
                 wmm.write(get_merged_weights_bytes(safetensor1, safetensor2, k, to_np_type[sttype], weights, base_ratio))
         else:
             # merge on memory
@@ -155,12 +155,12 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
                 k, json_file, safetensor1, safetensor2, base_ratio, np_type, weights = args
                 json_file[k]['weights'] = get_merged_weights_bytes(safetensor1, safetensor2, k, np_type, weights, base_ratio)
 
-            arg_zip = [(k, json_file, safetensor1, safetensor2, base_ratio, to_np_type[sttype], weights) for k, v in json_file.items()]
+            arg_zip = [(k, json_file, safetensor1, safetensor2, base_ratio, to_np_type[sttype], weights) for k in json_file.keys()]
             with ThreadPoolExecutor(max_workers=num_thread) as thread_pool:
                 thread_pool.map(merge_mt, arg_zip)
 
             # write
-            for k, v in json_file.items():
+            for v in json_file.values():
                 wmm.write(v['weights'])
 
 def get_ratio(weights, k, base_ratio):
