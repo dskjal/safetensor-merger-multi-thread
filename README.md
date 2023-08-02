@@ -32,8 +32,8 @@ python .\merger.py Model_A_path Model_B_path Output_model_path Merge_ratio Weigh
 |Thread|RAM Usage(GB)|Time(sec)|
 |:---:|---:|---:|
 |1|8|180|
-|6|15|26|
-|12|15|22|
+|6|15|36|
+|12|15|25|
 
 # 概要
 - CPU でマージ
@@ -69,5 +69,5 @@ python .\merger.py Model_A_path Model_B_path Output_model_path Merge_ratio Weigh
 |Thread|RAM Usage(GB)|Time(sec)|
 |:---:|---:|---:|
 |1|8|180|
-|6|15|26|
-|12|15|22|
+|6|15|36|
+|12|15|25|
