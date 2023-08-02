@@ -131,43 +131,29 @@ def write_multi_thread(out_path, safetensor1, safetensor2, base_ratio, sttype='F
         wmm.write((json_size).to_bytes(8, byteorder))
         wmm.write(json_binary)
 
-        # fix position_id https://note.com/bbcmc/n/n12c05bf109cc
-        position_id_keys = [ k for k, v in json_file.items() if k.endswith('position_ids')]
+        def get_merged_weights_bytes(safetensor1, safetensor2, k, np_type, weights, base_ratio):
+            try:
+                w1 = safetensor1.get_params(k, nptype=np_type)
+                w2 = safetensor2.get_params(k, nptype=np_type)
+                ratio = get_ratio(weights, k, base_ratio)
+                weighted = ratio * w1 + (1-ratio) * w2
+            except:
+                weighted = w1
 
+            if k in [ k for k, v in json_file.items() if k.endswith('position_ids')]:
+                # fix position_id https://note.com/bbcmc/n/n12c05bf109cc
+                weighted.round()
+            return weighted.tobytes()
+        
         # merge
         if num_thread == 1:
-            np_type = to_np_type[sttype]
             for k, v in json_file.items():
-                ratio = get_ratio(weights, k, base_ratio)
-
-                try:
-                    w1 = safetensor1.get_params(k, nptype=np_type)
-                    w2 = safetensor2.get_params(k, nptype=np_type)
-                    weighted = ratio * w1 + (1-ratio) * w2
-                except:
-                    weighted = w1
-                
-                if k in position_id_keys:
-                    # fix position_id https://note.com/bbcmc/n/n12c05bf109cc
-                    weighted.round()
-
-                wmm.write(weighted.tobytes())
+                wmm.write(get_merged_weights_bytes(safetensor1, safetensor2, k, to_np_type[sttype], weights, base_ratio))
         else:
             # merge on memory
             def merge_mt(args):
                 k, json_file, safetensor1, safetensor2, base_ratio, np_type, weights = args
-                try:
-                    w1 = safetensor1.get_params(k, nptype=np_type)
-                    w2 = safetensor2.get_params(k, nptype=np_type)
-                    ratio = get_ratio(weights, k, base_ratio)
-                    weighted = (ratio * w1 + (1-ratio) * w2)
-
-                    if k in position_id_keys:
-                        # fix position_id https://note.com/bbcmc/n/n12c05bf109cc
-                        weighted.round()
-                    json_file[k]['weights'] = weighted.tobytes()
-                except:
-                    json_file[k]['weights'] = w1.tobytes()
+                json_file[k]['weights'] = get_merged_weights_bytes(safetensor1, safetensor2, k, np_type, weights, base_ratio)
 
             arg_zip = [(k, json_file, safetensor1, safetensor2, base_ratio, to_np_type[sttype], weights) for k, v in json_file.items()]
             with ThreadPoolExecutor(max_workers=num_thread) as thread_pool:
