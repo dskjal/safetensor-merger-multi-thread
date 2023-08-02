@@ -221,4 +221,4 @@ if args.weight_file_path:
 with open('stat_xl.csv', 'w') as f:
     for k, v in st.get_json().items():
         f.write(f'{int(np.prod(v["shape"]))},{k}\n')
-#write_multi_thread(args.out, st, st2, args.ratio, sttype=args.dtype, num_thread=args.num_thread, metadata=args.meta_data, write_metadata=not args.discard_metadata, weights=weights)
+write_multi_thread(args.out, st, st2, args.ratio, sttype=args.dtype, num_thread=args.num_thread, metadata=args.meta_data, write_metadata=not args.discard_metadata, weights=weights)
