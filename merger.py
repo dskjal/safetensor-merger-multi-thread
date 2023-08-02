@@ -194,7 +194,7 @@ def weight_loader(path):
             print("Apply SDXL weights.")
         else:
             print(f"Invalid form. Input file {path} contains {l} weights. SD 1.x or 2.x just contains 25 weights. SDXL just contains 17 weights.")
-            return []
+            exit(1)
         
         out = []
         num_block = int((l-1)/2)
