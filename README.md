@@ -26,6 +26,7 @@ python .\merger.py Model_A_path Model_B_path Output_model_path Merge_ratio Memor
 - Ryzen 5 2600 (6 core 12 thread)
 - RAM 32 GB
 - file size 6.7 GB SDXL
+- NVMe SSD
 
 ### Result
 |Thread|RAM Usage(GB)|Time(sec)|
@@ -62,6 +63,7 @@ python .\merger.py Model_A_path Model_B_path Output_model_path Merge_ratio Memor
 - Ryzen 5 2600 (6 core 12 thread)
 - RAM 32 GB
 - file size 6.7 GB SDXL
+- NVMe SSD
 
 ### 結果
 |Thread|RAM Usage(GB)|Time(sec)|
