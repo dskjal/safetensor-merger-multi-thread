@@ -3,6 +3,11 @@
 - Less consume RAM since using a memory-mapped file
 - Multi-threading merges fast
 
+# Requirements
+```
+python -m pip install numpy
+```
+
 # How to use
 ### command example
 python .\merger.py Model_A_path Model_B_path Output_model_path Merge_ratio Weight_type --num_thread 12 --weight_file_path weights.txt
@@ -39,6 +44,11 @@ python .\merger.py Model_A_path Model_B_path Output_model_path Merge_ratio Weigh
 - CPU でマージ
 - メモリマップトファイルを使用するので省メモリ
 - マルチスレッド動作
+
+# 依存ライブラリのインストール
+```
+python -m pip install numpy
+```
 
 # 使い方
 ### コマンド例
